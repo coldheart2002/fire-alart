@@ -37,8 +37,8 @@ AsyncWebServer server(80);
 unsigned long previousMillis = 0; // will store last time DHT was updated
 unsigned long buzzerOffTime = 0;  // will store last time buzzer was turned off
 
-// Updates DHT readings every 10 seconds
-const long interval = 5000;
+// Updates DHT readings every n seconds
+const long interval = 1900;
 
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
@@ -139,7 +139,6 @@ const char index_html[] PROGMEM = R"rawliteral(
             <span
               id="buzzerStatus"
               class="value"
-              style="text-transform: uppercase"
               >%BUZZER_STATUS%</span
             >
           </p>
@@ -215,7 +214,7 @@ String processor(const String &var)
   }
   else if (var == "BUZZER_STATUS")
   {
-    return buzzerOn ? "On" : "Off";
+    return buzzerOn ? "ON" : "OFF";
   }
   return String();
 }
@@ -257,7 +256,7 @@ void setup()
   server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send_P(200, "text/plain", String(h).c_str()); });
   server.on("/buzzerStatus", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send_P(200, "text/plain", buzzerOn ? "On" : "Off"); });
+            { request->send_P(200, "text/plain", buzzerOn ? "ON" : "OFF"); });
 
   // Start server
   server.begin();
@@ -277,6 +276,7 @@ void loop()
     // if temperature read failed, don't change t value
     if (isnan(newT))
     {
+      t = 0.0;
       Serial.println("Failed to read from DHT sensor!");
     }
     else
@@ -291,6 +291,7 @@ void loop()
     // if humidity read failed, don't change h value
     if (isnan(newH))
     {
+      h = 0.0;
       Serial.println("Failed to read from DHT sensor!");
     }
     else

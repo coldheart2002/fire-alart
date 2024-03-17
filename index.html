@@ -72,7 +72,7 @@
             <span class="dht-labels">Temperature</span>
           </p>
           <p>
-            <span id="temperature" class="value">%TEMPERATURE%</span
+            <span id="temperature" class="value">40</span
             ><sup class="units">&deg;C</sup>
           </p>
         </div>
@@ -121,36 +121,36 @@
         }
       };
 
-      setInterval(function () {
-        fetch("/temperature")
-          .then((response) => response.text())
-          .then((data) => {
-            document.getElementById("temperature").textContent = data;
-          })
-          .catch((error) =>
-            console.error("Error fetching temperature:", error)
-          );
-      }, 2000);
+      // setInterval(function () {
+      //   fetch("/temperature")
+      //     .then((response) => response.text())
+      //     .then((data) => {
+      //       document.getElementById("temperature").textContent = data;
+      //     })
+      //     .catch((error) =>
+      //       console.error("Error fetching temperature:", error)
+      //     );
+      // }, 2000);
 
-      setInterval(function () {
-        fetch("/humidity")
-          .then((response) => response.text())
-          .then((data) => {
-            document.getElementById("humidity").textContent = data;
-          })
-          .catch((error) => console.error("Error fetching humidity:", error));
-      }, 2000);
+      // setInterval(function () {
+      //   fetch("/humidity")
+      //     .then((response) => response.text())
+      //     .then((data) => {
+      //       document.getElementById("humidity").textContent = data;
+      //     })
+      //     .catch((error) => console.error("Error fetching humidity:", error));
+      // }, 2000);
 
-      setInterval(function () {
-        fetch("/buzzerStatus")
-          .then((response) => response.text())
-          .then((data) => {
-            document.getElementById("buzzerStatus").textContent = data;
-          })
-          .catch((error) =>
-            console.error("Error fetching buzzer status:", error)
-          );
-      }, 2000);
+      // setInterval(function () {
+      //   fetch("/buzzerStatus")
+      //     .then((response) => response.text())
+      //     .then((data) => {
+      //       document.getElementById("buzzerStatus").textContent = data;
+      //     })
+      //     .catch((error) =>
+      //       console.error("Error fetching buzzer status:", error)
+      //     );
+      // }, 2000);
 
       tempMon();
     </script>
