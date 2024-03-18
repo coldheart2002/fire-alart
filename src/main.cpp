@@ -115,7 +115,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             <i class="fa-solid fa-temperature-low" style="color: #059e8a"></i>
             <span class="dht-labels">Temperature</span>
           </p>
-          <p>
+          <p id="tempValue">
             <span id="temperature" class="value">%TEMPERATURE%</span
             ><sup class="units">&deg;C</sup>
           </p>
@@ -150,17 +150,13 @@ const char index_html[] PROGMEM = R"rawliteral(
     <script>
       const highTemp = 40.0;
       const tempMon = () => {
-        const temptValue = document.getElementById("temperature");
+        const temptValue = document.getElementById("tempValue");
         if (parseFloat(temptValue.textContent) >= highTemp) {
-          temptValue.parentElement.style.color = "red";
-          temptValue.parentElement.style.fontWeight = "bold";
-          temptValue.parentElement.parentElement.style.backgroundColor =
-            "#FFC107";
+          temptValue.style.color = "red";
+          temptValue.style.fontWeight = "bold";
         } else {
-          temptValue.parentElement.style.color = "";
+          temptValue.style.color = "";
           temptValue.style.fontWeight = "normal";
-          temptValue.parentElement.parentElement.style.backgroundColor =
-            "#e5ebe7";
         }
       };
 
