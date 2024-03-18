@@ -7,10 +7,11 @@
 #include <ESPAsyncWebServer.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
+#include <ArduinoJson.h> // Include the ArduinoJson library for JSON handling
 
 // Replace with your network credentials
-const char *ssid = "PLDTHOMEFIBR947b0";
-const char *password = "PLDTWIFIur2ez";
+const char *ssid = "CTU Registrar";
+const char *password = "<<<r3g!strar2023>>>";
 
 #define DHTPIN 5     // Digital pin D1 connected to the DHT sensor
 #define BUZZER_PIN 4 // Digital pin D2 connected to the buzzer
@@ -82,7 +83,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         flex-direction: column;
         align-items: center;
         padding: 30px;
-        background-color: hsla(140, 12%, 91%, 0.778);
+        background-color: #e5ebe7;
       }
       .readings {
         display: flex;
@@ -159,38 +160,21 @@ const char index_html[] PROGMEM = R"rawliteral(
           temptValue.parentElement.style.color = "";
           temptValue.style.fontWeight = "normal";
           temptValue.parentElement.parentElement.style.backgroundColor =
-            "hsla(140, 12%, 91%, 0.778)";
+            "#e5ebe7";
         }
       };
 
       setInterval(function () {
-        fetch("/temperature")
-          .then((response) => response.text())
+        fetch("/data") // Updated route to fetch data from /data endpoint
+          .then((response) => response.json()) // Parse response as JSON
           .then((data) => {
-            document.getElementById("temperature").textContent = data;
+            document.getElementById("temperature").textContent = parseFloat(data.temperature).toFixed(2);
+            document.getElementById("humidity").textContent = parseFloat(data.humidity).toFixed(2);
+            document.getElementById("buzzerStatus").textContent = data.buzzer_status;
+            tempMon(); // Call temperature monitoring function
           })
           .catch((error) =>
-            console.error("Error fetching temperature:", error)
-          );
-      }, 2000);
-
-      setInterval(function () {
-        fetch("/humidity")
-          .then((response) => response.text())
-          .then((data) => {
-            document.getElementById("humidity").textContent = data;
-          })
-          .catch((error) => console.error("Error fetching humidity:", error));
-      }, 2000);
-
-      setInterval(function () {
-        fetch("/buzzerStatus")
-          .then((response) => response.text())
-          .then((data) => {
-            document.getElementById("buzzerStatus").textContent = data;
-          })
-          .catch((error) =>
-            console.error("Error fetching buzzer status:", error)
+            console.error("Error fetching data:", error)
           );
       }, 2000);
 
@@ -251,12 +235,24 @@ void setup()
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send_P(200, "text/html", index_html, processor); });
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send_P(200, "text/plain", String(t).c_str()); });
-  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send_P(200, "text/plain", String(h).c_str()); });
-  server.on("/buzzerStatus", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send_P(200, "text/plain", buzzerOn ? "ON" : "OFF"); });
+
+  // Route for /data to return JSON data
+  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    // Create a JSON object
+    StaticJsonDocument<200> doc;
+
+    // Fill the JSON object with temperature, humidity, and buzzer status data
+    doc["temperature"] = t;
+    doc["humidity"] = h;
+    doc["buzzer_status"] = buzzerOn ? "ON" : "OFF";
+
+    // Serialize the JSON object to a string
+    String jsonString;
+    serializeJson(doc, jsonString);
+
+    // Send the JSON response
+    request->send(200, "application/json", jsonString); });
 
   // Start server
   server.begin();
